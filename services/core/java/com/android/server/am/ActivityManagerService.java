@@ -2125,6 +2125,7 @@ public class ActivityManagerService extends IActivityManager.Stub
                 }
             } break;
             case SHOW_FINGERPRINT_ERROR_UI_MSG: {
+            	/*
                 if (mShowDialogs) {
                     AlertDialog d = new BaseErrorDialog(mUiContext);
                     d.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ERROR);
@@ -2135,6 +2136,7 @@ public class ActivityManagerService extends IActivityManager.Stub
                             obtainMessage(DISMISS_DIALOG_UI_MSG, d));
                     d.show();
                 }
+                */
             } break;
             case SHOW_COMPAT_MODE_DIALOG_UI_MSG: {
                 synchronized (ActivityManagerService.this) {

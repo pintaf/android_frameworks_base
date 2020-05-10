@@ -186,6 +186,9 @@ public final class DisplayManagerService extends SystemService {
     // services should be started.  This option may disable certain display adapters.
     public boolean mOnlyCore;
 
+	private boolean mPhoneMirroringEnabled;
+
+
     // True if the display manager service should pretend there is only one display
     // and only tell applications about the existence of the default logical display.
     // The display manager can still mirror content to secondary displays but applications
@@ -206,11 +209,28 @@ public final class DisplayManagerService extends SystemService {
     // List of all logical displays indexed by logical display id.
     private final SparseArray<LogicalDisplay> mLogicalDisplays =
             new SparseArray<LogicalDisplay>();
-    private int mNextNonDefaultDisplayId = Display.DEFAULT_DISPLAY + 1;
+    
+    private int mNextNonDefaultDisplayId = Display.DEFAULT_DESKTOP_DISPLAY + 1;
 
     // List of all display transaction listeners.
     private final CopyOnWriteArrayList<DisplayTransactionListener> mDisplayTransactionListeners =
             new CopyOnWriteArrayList<DisplayTransactionListener>();
+
+    private void setPhoneMirroringEnabledInternal(boolean enabled) {
+        synchronized(mSyncRoot) {
+            if (mPhoneMirroringEnabled != enabled) {
+                Slog.d(TAG, "setPhoneMirroringEnabledInternal -> " + enabled);
+                mPhoneMirroringEnabled = enabled;
+                scheduleTraversalLocked(false);
+            }
+        }
+    }
+
+    private boolean isPhoneMirroringEnabledInternal() {
+        synchronized(mSyncRoot) {
+		return mPhoneMirroringEnabled;
+        }
+    }
 
     // Display power controller.
     private DisplayPowerController mDisplayPowerController;
@@ -1264,6 +1284,8 @@ public final class DisplayManagerService extends SystemService {
         final DisplayDeviceInfo info = device.getDisplayDeviceInfoLocked();
         final boolean ownContent = (info.flags & DisplayDeviceInfo.FLAG_OWN_CONTENT_ONLY) != 0;
 
+		int layerStackOverride = -1;
+
         // Find the logical display that the display device is showing.
         // Certain displays only ever show their own content.
         LogicalDisplay display = findLogicalDisplayForDeviceLocked(device);
@@ -1274,7 +1296,23 @@ public final class DisplayManagerService extends SystemService {
                 display = null;
             }
             if (display == null) {
-                display = mLogicalDisplays.get(Display.DEFAULT_DISPLAY);
+                
+                // This is the mirroring case.
+                //
+                // We basically swap between mirroring default display or desktop display.
+                // In the case of default display, there is a logical display around. But
+                // for desktop display, we don't have a logical display and just set the
+                // layerstack of the display device to the desktop's reserved layerstack.
+                if (isPhoneMirroringEnabledInternal()) {
+                    // Stock phone mirroring path
+                    display = mLogicalDisplays.get(Display.DEFAULT_DISPLAY);
+                } else {
+                    // Desktop mirroring path
+                    // Use the associated logical display for this device as usual
+                    display = findLogicalDisplayForDeviceLocked(device);
+                    // ...but override the logical display's layerstack with the desktop layerstack
+                    layerStackOverride = Display.DEFAULT_DESKTOP_DISPLAY;
+                }
             }
         }
 
@@ -1285,8 +1323,8 @@ public final class DisplayManagerService extends SystemService {
                     + device.getDisplayDeviceInfoLocked());
             return;
         }
-        display.configureDisplayLocked(t, device, info.state == Display.STATE_OFF);
-
+        display.configureDisplayLocked(t, device, info.state == Display.STATE_OFF , layerStackOverride);
+ 
         // Update the viewports if needed.
         if (!mDefaultViewport.valid
                 && (info.flags & DisplayDeviceInfo.FLAG_DEFAULT_DISPLAY) != 0) {
@@ -1619,6 +1657,36 @@ public final class DisplayManagerService extends SystemService {
                 Binder.restoreCallingIdentity(token);
             }
         }
+
+        @Override // Binder call
+        public void enablePhoneMirroring() {
+            final long token = Binder.clearCallingIdentity();
+            try {
+	          setPhoneMirroringEnabledInternal(true);
+            } finally {
+                Binder.restoreCallingIdentity(token);
+            }
+        }
+
+        @Override // Binder call
+        public void disablePhoneMirroring() {
+            final long token = Binder.clearCallingIdentity();
+            try {
+                 setPhoneMirroringEnabledInternal(false);
+            } finally {
+                Binder.restoreCallingIdentity(token);
+            }
+        }
+
+        @Override // Binder call
+        public boolean isPhoneMirroringEnabled() {
+            final long token = Binder.clearCallingIdentity();
+            try {
+                return isPhoneMirroringEnabledInternal();
+            } finally {
+                Binder.restoreCallingIdentity(token);
+            }
+         }
 
         /**
          * Returns the list of all display ids.

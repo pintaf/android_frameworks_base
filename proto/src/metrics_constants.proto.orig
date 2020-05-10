@@ -6497,7 +6497,6 @@ message MetricsEvent {
     // OS: Q
     ACTION_EMERGENCY_DIALER_FROM_POWER_MENU = 1569;
 
-    SETTINGS_DESKTOP_CATEGORY = 9001;
     // ---- End Q Constants, all Q constants go above this line ----
 
     // Add new aosp constants above this line.

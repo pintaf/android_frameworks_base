@@ -88,7 +88,6 @@ import com.android.server.media.MediaUpdateService;
 import com.android.server.media.MediaSessionService;
 import com.android.server.media.projection.MediaProjectionManagerService;
 import com.android.server.net.NetworkPolicyManagerService;
-import com.android.server.mperspective.PerspectiveService;
 import com.android.server.net.NetworkStatsService;
 import com.android.server.net.watchlist.NetworkWatchlistService;
 import com.android.server.notification.NotificationManagerService;
@@ -1111,8 +1110,6 @@ public final class SystemServer {
             }
             traceEnd();
 
- 
-
             traceBeginAndSlog("StartIpSecService");
             try {
                 ipSecService = IpSecService.create(context);
@@ -1156,17 +1153,6 @@ public final class SystemServer {
             traceEnd();
 
             if (!mOnlyCore) {
-
-            	traceBeginAndSlog("StartPerspectiveService");
- 				try {
-                    mSystemServiceManager.startService(PerspectiveService.Lifecycle.class);
-                } 
-                catch (Throwable e) 
-                {
-                    reportWtf("starting PerspectiveService", e);
-                }
-            	traceEnd();
-
                 if (context.getPackageManager().hasSystemFeature(
                             PackageManager.FEATURE_WIFI)) {
                     // Wifi Service must be started first for wifi-related services.

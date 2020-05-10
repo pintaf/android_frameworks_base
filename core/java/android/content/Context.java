@@ -4201,6 +4201,17 @@ public abstract class Context {
     public static final String TIME_ZONE_RULES_MANAGER_SERVICE = "timezone";
 
     /**
+     * Use with {@link #getSystemService} to retrieve a {@link
+     * android.mperspective.PerspectiveManager} instance for managing
+     * perspectives.
+     * @see #getSystemService
+     * @see android.mperspective.PerspectiveManager
+     * @hide
+     */
+    public static final String PERSPECTIVE_SERVICE = "perspective";
+
+    
+    /**
      * Use with {@link #getSystemService(String)} to retrieve a
      * {@link android.content.pm.CrossProfileApps} for cross profile operations.
      *

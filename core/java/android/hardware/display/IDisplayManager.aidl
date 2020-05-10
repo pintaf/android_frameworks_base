@@ -87,6 +87,12 @@ interface IDisplayManager {
 
     // Get a stable metric for the device's display size. No permissions required.
     Point getStableDisplaySize();
+ 
+    void enablePhoneMirroring();
+
+    void disablePhoneMirroring();
+
+    boolean isPhoneMirroringEnabled();
 
     // Requires BRIGHTNESS_SLIDER_USAGE permission.
     ParceledListSlice getBrightnessEvents(String callingPackage);

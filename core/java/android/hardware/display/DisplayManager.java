@@ -425,6 +425,18 @@ public final class DisplayManager {
         mGlobal.unregisterDisplayListener(listener);
     }
 
+    public void enablePhoneMirroring() {
+        mGlobal.enablePhoneMirroring();
+     }
+
+    public void disablePhoneMirroring() {
+        mGlobal.disablePhoneMirroring();
+     }
+
+    public boolean isPhoneMirroringEnabled() {
+        return mGlobal.isPhoneMirroringEnabled();
+     }
+
     /**
      * Starts scanning for available Wifi displays.
      * The results are sent as a {@link #ACTION_WIFI_DISPLAY_STATUS_CHANGED} broadcast.

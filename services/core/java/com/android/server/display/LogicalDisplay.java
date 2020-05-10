@@ -322,29 +322,25 @@ final class LogicalDisplay {
         }
     }
 
-    /**
-     * Applies the layer stack and transformation to the given display device
-     * so that it shows the contents of this logical display.
-     *
-     * We know that the given display device is only ever showing the contents of
-     * a single logical display, so this method is expected to blow away all of its
-     * transformation properties to make it happen regardless of what the
-     * display device was previously showing.
-     *
-     * The caller must have an open Surface transaction.
-     *
-     * The display device may not be the primary display device, in the case
-     * where the display is being mirrored.
-     *
-     * @param device The display device to modify.
-     * @param isBlanked True if the device is being blanked.
-     */
+ 
     public void configureDisplayLocked(SurfaceControl.Transaction t,
             DisplayDevice device,
-            boolean isBlanked) {
-        // Set the layer stack.
-        device.setLayerStackLocked(t, isBlanked ? BLANK_LAYER_STACK : mLayerStack);
+            boolean isBlanked )
+    {
+       configureDisplayLocked(t,device,isBlanked,-1);
+    }
 
+ 
+    public void configureDisplayLocked(SurfaceControl.Transaction t,
+            DisplayDevice device,
+            boolean isBlanked,int layerStackOverride) {
+        // Set the layer stack.
+ 
+         int layerStack = layerStackOverride < 0 ? mLayerStack : layerStackOverride;
+         device.setLayerStackLocked(t, isBlanked ? BLANK_LAYER_STACK : layerStack);
+    
+
+    	//
         // Set the color mode and mode.
         if (device == mPrimaryDisplayDevice) {
             device.requestDisplayModesLocked(

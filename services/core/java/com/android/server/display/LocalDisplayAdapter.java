@@ -442,6 +442,13 @@ final class LocalDisplayAdapter extends DisplayAdapter {
                     if (res.getBoolean(com.android.internal.R.bool.config_localDisplaysPrivate)) {
                         mInfo.flags |= DisplayDeviceInfo.FLAG_PRIVATE;
                     }
+
+ 
+                    if (SystemProperties.getBoolean("persist.m.desktop.hdmi", true)) {
+                        /* HDMI displays are the default external display */
+                        mInfo.flags |= DisplayDeviceInfo.FLAG_DEFAULT_EXTERNAL_DISPLAY;
+                    }
+
                 }
             }
             return mInfo;

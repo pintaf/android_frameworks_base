@@ -99,6 +99,8 @@ public final class Display {
      */
     public static final int DEFAULT_DISPLAY = 0;
 
+	public static final int DEFAULT_DESKTOP_DISPLAY = 1;
+
     /**
      * Invalid display id.
      */

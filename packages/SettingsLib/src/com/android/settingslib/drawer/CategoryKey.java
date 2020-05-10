@@ -52,6 +52,9 @@ public final class CategoryKey {
     public static final String CATEGORY_NIGHT_DISPLAY =
             "com.android.settings.category.ia.night_display";
 
+	public static final String CATEGORY_MARU_DESKTOP =
+ 		"com.android.settings.category.ia.desktop";
+
     public static final Map<String, String> KEY_COMPAT_MAP;
 
     static {
